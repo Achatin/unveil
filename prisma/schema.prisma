@@ -1,0 +1,49 @@
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Project {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+
+  createdAt   DateTime @default(now())
+
+  annotations Annotation[]
+}
+
+model Annotation {
+  id          String   @id @default(cuid())
+
+  projectId   String
+
+  // context (what page was being annotated)
+  url         String
+  title       String?
+
+  // classification
+  label       String
+  description String?
+  location    String?
+
+  // UI geometry (for bounding boxes)
+  x           Float
+  y           Float
+  width       Float
+  height      Float
+
+  // DOM + text context
+  selector    String?
+  text        String?
+
+  screenshot  String?
+
+  createdAt   DateTime @default(now())
+
+  project     Project @relation(fields: [projectId], references: [id])
+}
