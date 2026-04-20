@@ -19,10 +19,22 @@
     "service_worker": "background.js"
   },
 
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "UX Annotator"
+  },
+
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
       "js": ["content.js"]
+    }
+  ],
+
+  "web_accessible_resources": [
+    {
+      "resources": ["labels.json"],
+      "matches": ["<all_urls>"]
     }
   ]
 }

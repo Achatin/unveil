@@ -1,9 +1,38 @@
 <!DOCTYPE html>
 <html>
 
-<body>
-    <h3>Annotations</h3>
-    <div id="list"></div>
+<head>
+    <meta charset="UTF-8" />
+</head>
+
+<body style="font-family:sans-serif; width:240px; padding:10px;">
+    <h3>UX Annotator</h3>
+
+    <label>
+        <input type="checkbox" id="toggle" />
+        Enable annotation
+    </label>
+
+    <br /><br />
+
+    <div id="status" style="
+    margin-top:10px;
+    font-size:12px;
+    color:#b00020;
+    display:none;
+    "></div>
+
+    <div id="project">
+        <label>Project:</label>
+        <select id="projectSelect" style="width:100%; margin-top:5px;"></select>
+    </div>
+
+    <br /><br />
+
+    <a id="projectLink" href="#" target="_blank" style="display:none;">
+        Open project →
+    </a>
+
     <script src="popup.js"></script>
 </body>
 

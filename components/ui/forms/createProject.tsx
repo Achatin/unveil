@@ -27,6 +27,7 @@ import {
 
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
+import { FolderPlus } from "lucide-react"
 
 const formSchema = z.object({
   name: z.string().min(3).max(50),
@@ -59,7 +60,7 @@ export function CreateProjectDialog() {
     <Dialog>
       {/* Trigger */}
       <DialogTrigger>
-        <Button variant="outline">Create Project</Button>
+        <Button variant="default" className="px-4"><FolderPlus /> Create Project</Button>
       </DialogTrigger>
 
       {/* Content */}

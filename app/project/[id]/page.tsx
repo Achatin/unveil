@@ -1,57 +1,35 @@
-"use client"
-
-import { useEffect, useState } from "react"
-import { useParams } from "next/navigation"
 import { Annotation, Project } from "@prisma/client"
-import Image from "next/image"
+import { DataTable } from "./data-table"
+import { columns } from "./columns"
 
-export default function ProjectPage() {
-  const { id } = useParams<{ id: string }>()
-  const [project, setProject] = useState<Project | null>(null)
-  const [annotations, setAnnotations] = useState<Annotation[]>([])
+async function fetchProject(id: string): Promise<Project | null> {
+  const resProject = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/project/${id}`)
+  if (!resProject.ok) {
+    console.error("Failed:", await resProject.text())
+    return null
+  }
+  return await resProject.json()
+}
 
-  useEffect(() => {
-    async function load() {
-        const resProject = await fetch(`/api/project/${id}`)
+async function getAnnotations(): Promise<Annotation[]> {
+  const resAnnotations = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/annotation`)
+  if (!resAnnotations.ok) {
+    console.error("Failed:", await resAnnotations.text())
+    return []
+  }
+  return await resAnnotations.json()
+}
 
-        if (!resProject.ok) {
-          console.error("Failed:", await resProject.text())
-        return
-        }
-
-        const data = await resProject.json()
-        setProject(data)
-
-        const resAnnotations = await fetch("/api/annotation")
-
-        if (!resAnnotations.ok) {
-          console.error("Failed:", await resAnnotations.text())
-          return
-        }
-
-        const annotationsData = await resAnnotations.json()
-        setAnnotations(annotationsData)
-    }
-
-    if (id) load()
-  }, [id])
+export default async function ProjectPage({ params }: { params: { id: string } }) {
+  const { id } = await params;
+  const project = await fetchProject(id)  
+  const annotations: Annotation[] = await getAnnotations();
 
   if (!project) return <div>Loading...</div>
 
   return (
-    <div>
-      <h1>{project.name}</h1>
-      <p>{project.description}</p>
-
-      <h2>Annotations</h2>
-      <ul>
-        {annotations.map((annotation) => (
-          <li key={annotation.id}>
-            {annotation.label}
-            <Image src={annotation.screenshot!} alt="Annotation Screenshot" width={200} height={200} />
-        </li>
-        ))}
-      </ul>
-    </div>
+    <main className="pt-4 bg-muted">
+      <DataTable columns={columns} data={annotations} />
+    </main>
   )
 }

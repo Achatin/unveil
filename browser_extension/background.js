@@ -10,26 +10,57 @@ async function ensureOffscreen() {
   }
 }
 
-// -----------------------------
-// MAIN MESSAGE HANDLER
+function captureTab() {
+  return new Promise((resolve, reject) => {
+    chrome.tabs.captureVisibleTab(
+      null,
+      { format: "png" },
+      (dataUrl) => {
+        if (chrome.runtime.lastError) {
+          reject(chrome.runtime.lastError);
+        } else {
+          resolve(dataUrl);
+        }
+      }
+    );
+  });
+}
+
 // -----------------------------
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
-  if (msg.type === "CAPTURE_AND_CROP") {
-    chrome.tabs.captureVisibleTab(null, { format: "png" }, async (dataUrl) => {
+  if (msg.type !== "CAPTURE_AND_CROP") return;
+
+  (async () => {
+    try {
+      const dataUrl = await captureTab();
+
       await ensureOffscreen();
 
-      chrome.runtime.sendMessage(
-        {
+      const response = await new Promise((resolve, reject) => {
+        chrome.runtime.sendMessage({
           type: "CROP_IMAGE",
           image: dataUrl,
-          box: msg.box
+          box: msg.box,
+          scrollX: msg.scrollX,
+          scrollY: msg.scrollY,
+          devicePixelRatio: msg.devicePixelRatio
         },
-        (res) => {
-          sendResponse({ croppedImage: res.cropped });
-        }
-      );
-    });
+          (res) => {
+            if (chrome.runtime.lastError) {
+              reject(chrome.runtime.lastError);
+            } else {
+              resolve(res);
+            }
+          }
+        );
+      });
 
-    return true;
-  }
+      sendResponse({ croppedImage: response.cropped });
+    } catch (err) {
+      console.error("CAPTURE_AND_CROP failed:", err);
+      sendResponse({ error: err.message });
+    }
+  })();
+
+  return true;
 });

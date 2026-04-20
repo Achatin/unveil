@@ -21,11 +21,17 @@ export default function Home() {
 
   
   return (
-    <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-background sm:items-start">
-      <h1>Welcome 👋</h1>
+    <main className="w-full max-w-3xl flex-col items-center justify-between bg-background py-12 px-8">
+      <div className="mb-8">
+        <h1 className="font-semibold text-2xl mb-2">Welcome 👋</h1>
+        <p className="text-muted-foreground">This is your project dashboard.</p>
+      </div>
       {projects.length > 0 && (
         <div className="w-full">
-          <h2 className="text-2xl mb-4">Projects</h2>
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-2xl">Projects</h2>
+            <CreateProjectDialog />
+          </div>
           <ul className="space-y-4">
             {projects.map((p) => (
               <li key={p.id} className="p-4 border rounded">
@@ -37,8 +43,6 @@ export default function Home() {
           </ul>
         </div>
       )}
-
-      <CreateProjectDialog />
     </main>
   );
 }
